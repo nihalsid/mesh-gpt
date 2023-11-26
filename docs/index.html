@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Texturify: Generating Textures on 3D Shape Surfaces">
+    <meta name="keywords" content="Texurify, GAN, 3D textures, textures, stylegan">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MeshGPT: Generating Triangle Meshes with Decoder-Only Transformers</title>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+
+    <link rel="stylesheet" href="./static/css/bulma.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+    <link rel="stylesheet" href="./static/css/index.css">
+
+    <style>
+		.render_wrapper {
+			position: relative;
+            height: 300px;
+         }
+        .render_wrapper_small {
+			position: relative;
+            height: 200px;
+         }
+		.render_div {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
+
+        #interpolation-image-wrapper-car{
+            text-align: center;
+        }
+        #interpolation-image-wrapper-chair{
+            text-align: center;
+        }
+        .nested-columns {
+            margin-bottom: 0 !important;
+        }
+    </style>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script defer src="./static/js/fontawesome.all.min.js"></script>
+    <script src="./static/js/bulma-carousel.min.js"></script>
+    <script src="./static/js/bulma-slider.min.js"></script>
+    <script src="./static/js/index.js"></script>
+</head>
+
+<body>
+
+    <section class="hero">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered">
+                    <div class="column has-text-centered">
+                        <h1 class="title is-1 publication-title">MeshGPT: Generating Triangle Meshes with Decoder-Only Transformers</h1>
+                        <div class="is-size-5 publication-authors">
+                            <span class="author-block">
+                                <a href="https://nihalsid.github.io/">Yawar Siddiqui</a><sup>1</sup>,</span>
+                            <span class="author-block">
+                                <a href="https://scholar.google.com/citations?user=yQqW5q0AAAAJ&hl=it/">Antonio Alliegro</a><sup>2</sup>,</span>
+                            <span class="author-block">
+                                <a href="https://artonson.github.io/">Alexey Artemov</a><sup>1</sup>,</span>
+                            <span class="author-block">
+                                <a href="http://www.tatianatommasi.com/">Tatiana Tommasi</a><sup>2</sup>,
+                            </span>
+                            <span class="author-block">
+                                <a href="https://de.linkedin.com/in/dsirigatti/en">Daniele Sirigatti</a><sup>3</sup>,
+                            </span>
+                            <span class="author-block">
+                                <a href="https://de.linkedin.com/in/vladislav-rosov/en">Vladislav Rosov</a><sup>3</sup>,
+                            </span>
+                            <span class="author-block">
+                                <a href="https://www.3dunderstanding.org/team.html">Angela Dai</a><sup>1</sup>,
+                            </span>
+                            <span class="author-block">
+                                <a href="https://niessnerlab.org/members/matthias_niessner/profile.html">Matthias Nießner</a><sup>1</sup>
+                            </span>
+                        </div>
+
+                        <div class="is-size-5 publication-authors">
+                            <span class="author-block"><sup>1</sup>Technical University of Munich,</span>
+                            <span class="author-block"><sup>2</sup>Politecnico di Torino,</span>
+                            <span class="author-block"><sup>3</sup>AUDI AG</span>
+                        </div>
+
+                        <div class="column has-text-centered">
+                            <div class="publication-links">
+                                <!-- PDF Link. -->
+                                <span class="link-block">
+                                    <a href="static/MeshGPT.pdf"
+                                        class="external-link button is-normal is-rounded is-dark">
+                                        <span class="icon">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </span>
+                                        <span>Paper</span>
+                                    </a>
+                                </span>
+                                <span class="link-block">
+                                    <a class="external-link button is-normal is-rounded is-dark" href="#">
+                                        <span class="icon">
+                                            <i class="ai ai-arxiv"></i>
+                                        </span>
+                                        <span>arXiv</span>
+                                    </a>
+                                </span>
+                                <!-- Video Link. -->
+                                <span class="link-block">
+                                    <a href="#"
+                                        class="external-link button is-normal is-rounded is-dark">
+                                        <span class="icon">
+                                            <svg class="svg-inline--fa fa-youtube fa-w-18" aria-hidden="true"
+                                                focusable="false" data-prefix="fab" data-icon="youtube" role="img"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"
+                                                data-fa-i2svg="">
+                                                <path fill="currentColor"
+                                                    d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z">
+                                                </path>
+                                            </svg><!-- <i class="fab fa-youtube"></i> Font Awesome fontawesome.com -->
+                                        </span>
+                                        <span>Video</span>
+                                    </a>
+                                </span>
+
+
+                                <!-- Github Link. -->
+                                <span class="link-block">
+                                    <a href="https://github.com/nihalsid/mesh-gpt" class="external-link button is-normal is-rounded is-dark" disabled>
+                                        <span class="icon">
+                                            <i class="fab fa-github"></i>
+                                        </span>
+                                        <span>Code</span>
+                                    </a>
+                                </span>
+                                <!-- Dataset Link. -->
+                                <span class="link-block"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="hero teaser">
+        <div class="container is-max-desktop">
+            <div class="hero-body" style="text-align: center">
+                <div class="columns">
+                    <div class="column is-8" style="display: flex; justify-content: center; align-items: center; padding-top: 0; padding-bottom: 0">
+                        <img src="./static/teaser/web_teaser.jpg" style="max-height: 450px"/>
+                    </div>
+                    <div class="column is-4" style="height: 450px; padding: 0;">
+                        <div style="display: flex; height: 450px; justify-content: center;">
+                            <video poster="" autoplay="" muted="" loop="" style="pointer-events: none;">
+                                <source src="./static/teaser/web_teaser.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <h2 class=" subtitle has-text-centered" style="padding-top: 10px">
+                    <span class="dnerf">MeshGPT</span> creates triangle meshes by autoregressively sampling from a transformer model that has been trained to produce tokens from a learned geometric vocabulary. These tokens can then be decoded into the faces of a triangle mesh. Our method generates  clean, coherent, and compact meshes, characterized by sharp edges and high fidelity.
+                </h2>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="hero is-light is-small">
+        <div class="hero-body">
+            <div class="container">
+                <div id="results-carousel" class="carousel results-carousel">
+                    <div class="item item-steve render_wrapper">
+			            <div id="mesh_chair_0" class="render_div"></div>
+                    </div>
+                    <div class="item item-steve render_wrapper">
+			            <div id="mesh_chair_1" class="render_div"></div>
+                    </div>
+                    <div class="item item-steve render_wrapper">
+			            <div id="mesh_chair_2" class="render_div"></div>
+                    </div>
+                    <div class="item item-steve render_wrapper">
+			            <div id="mesh_chair_3" class="render_div"></div>
+                    </div>
+                    <div class="item item-steve render_wrapper">
+			            <div id="mesh_car_0" class="render_div"></div>
+                    </div>
+                    <div class="item item-steve render_wrapper">
+			            <div id="mesh_car_1" class="render_div"></div>
+                    </div>
+                    <div class="item item-steve render_wrapper">
+			            <div id="mesh_car_2" class="render_div"></div>
+                    </div>
+                    <div class="item item-steve render_wrapper">
+			            <div id="mesh_car_3" class="render_div"></div>
+                    </div>
+                </div>
+                <div style="text-align: center;">Press <b>G</b> to toggle wireframe. Press <b>R</b> to reset view. </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section">
+        <div class="container is-max-desktop">
+            <!-- Abstract. -->
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h2 class="title is-3">Abstract</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                        We introduce <span class="dnerf">MeshGPT</span>, a new approach for generating triangle meshes that reflects the compactness typical of artist-created meshes, in contrast to dense triangle meshes extracted by iso-surfacing methods from neural fields. Inspired by recent advances in powerful large language models, we adopt a sequence-based approach to autoregressively generate triangle meshes as sequences of triangles.
+                        </p>
+                        <p>
+                        We irst learn a vocabulary of latent quantized embeddings, using graph convolutions, which inform these embeddings of the local mesh geometry and topology. These embeddings are sequenced and decoded into triangles by a decoder, ensuring that they can effectively reconstruct the mesh. A transformer is then trained on this learned vocabulary to predict the index of the next embedding given previous embeddings. Once trained, our model can be autoregressively sampled to generate new triangle meshes, directly generating compact meshes with sharp edges, more closely imitating the efficient triangulation patterns of human-crafted meshes.
+                        </p>
+                        <p>
+                        <span class="dnerf">MeshGPT</span> demonstrates a notable improvement over state of the art mesh generation methods, with a 9% increase in shape coverage and a 30-point enhancement in FID scores across various categories.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Paper video. -->
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h2 class="title is-3">Video</h2>
+                    <div class="publication-video">
+                    <iframe src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+            <!--/ Paper video. -->
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container is-max-desktop">
+
+            <h3 class="title is-4">Comparison with baselines</h3>
+            <div class="content has-text-justified">
+                <p>
+                    Our approach produces compact meshes with sharp geometric details. In contrast, baselines often either miss these details, produce over-triangulated meshes, or output too simplistic shapes.
+                </p>
+            </div>
+
+            <div>
+                <section class="section" style="overflow:hidden;">
+                    <div class="container">
+                        <div id="post_images" class="carousel">
+                            <div class="item-1">
+                                <video poster="" autoplay="" muted loop="" style="pointer-events: none;">
+                                    <source src="./static/video/web_comparison_00111920.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <div class="item-2">
+                                <video poster="" autoplay="" muted loop="" style="pointer-events: none;">
+                                    <source src="./static/video/web_comparison_00112109.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <div class="item-3">
+                                <video poster="" autoplay="" muted loop="" style="pointer-events: none;">
+                                    <source src="./static/video/web_comparison_00112290.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <div class="item-4">
+                                <video poster="" autoplay="" muted loop="" style="pointer-events: none;">
+                                    <source src="./static/video/web_comparison_00112477.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                            <div class="item-5">
+                                <video poster="" autoplay="" muted loop="" style="pointer-events: none;">
+                                    <source src="./static/video/web_comparison_00112708.mp4" type="video/mp4">
+                                </video>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- End Hero Carousel -->
+
+                <script src="https://cdn.jsdelivr.net/npm/bulma-carousel@4.0.3/dist/js/bulma-carousel.min.js"></script>
+                <script>
+                    bulmaCarousel.attach('#post_images', {
+                          slidesToScroll: 1,
+                          slidesToShow: 1,
+                          loop: true,
+                    });
+                </script>
+            </div>
+
+            <!-- Novel datasets. -->
+            <div class="columns is-centered" style="margin-top: 25px">
+                <div class="column is-full-width">
+                    <h2 class="title is-4">Shape Completion</h2>
+                    <div class="content has-text-justified">
+                        <p>
+                            Given a partial mesh, our method can infer multiple possible shape completions.
+                        </p>
+                    </div>
+                    <div class="columns is-centered">
+                        <div style="display: flex; height: 450px; justify-content: center;">
+                            <video poster="" autoplay="" muted="" loop="" style="pointer-events: none;">
+                                <source src="./static/video/web_completion_00113336.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                    <div class="content has-text-justified">
+                        <p>
+                            Here we show completion as the partial input mesh is edited through user actions.
+                        </p>
+                    </div>
+                    <div class="columns is-centered">
+                        <div style="display: flex; height: 450px; justify-content: center;">
+                            <video poster="" autoplay="" muted="" loop="" style="pointer-events: none;">
+                                <source src="./static/video/web_completion_edit.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ Animation. -->
+
+            <div class="columns is-centered" style="margin-top: 15px">
+                <div class="column is-full-width">
+                    <h2 class="title is-4">3D Asset Generation for Scenes</h2>
+                    <div class="content has-text-justified" style="padding-top: 15px">
+                        <p>Our method can be used to generate 3D assets for scenes. Here we show a room populated with assets generated using our method.</p>
+                    </div>
+                    <div class="columns is-centered" style="text-align: center; padding: 5px">
+                        <video poster="" autoplay="" muted="" loop="" style="pointer-events: none; border-radius: 10px">
+                            <source src="./static/video/web_outro.mp4" type="video/mp4">
+                        </video>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Overview. -->
+            <div class="columns is-centered" style="margin-top: 15px">
+                <div class="column is-full-width">
+                    <h2 class="title is-4">Method Overview</h2>
+                    <div class="columns is-centered" style="text-align: center">
+                        <div class="column" style="padding: 2em">
+                            <img src="./static/images/reconstruction_small.jpg" alt="reconstruction_small">
+                            <p style="margin-top: 1em; font-weight: bold">Vocabulary Learning</p>
+                        </div>
+                        <div class="column" style="align-self: center">
+                            <img src="./static/images/sequencing_small.jpg" alt="sequencing_small">
+                            <p style="margin-top: 1em; font-weight: bold">Transformer Training</p>
+                        </div>
+                    </div>
+                    <div class="content has-text-justified" style="padding-top: 15px">
+                        <p>We first learn a vocabulary for triangle meshes, which we then use for autoregressive generation of a mesh.We learn our vocabulary of geometric embeddings from a vast collection of shapes. This is done using an encoder-decoder network, which features vector quantization at its bottleneck.</p>
+                        <p> This transformer is specifically designed for sequence prediction over tokens from the learned vocabulary.</p>
+                        <p>Once fully trained, it enables the direct sampling of meshes as sequences from this vocabulary.</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!--
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <h2 class="title is-3">Method Overview</h2>
+                </div>
+            </div>
+            <section class="hero teaser">
+                <div class="container is-max-desktop">
+                    <div class="hero-body">
+                        <img src="./static/teaser/overview.jpg"/>
+                    </div>
+                </div>
+            </section>
+            <div class="columns is-centered has-text-centered">
+                <div class="column is-four-fifths">
+                    <div class="content has-text-justified">
+                        <p>Surface features from an input 3D mesh are encoded through a face convolution-based encoder and decoded through a StyleGAN2-inspired decoder to generate textures directly on the surface of the mesh.</p>
+                        <p>To ensure that generated textures are realistic, the textured mesh is differentiably rendered from different view points and is critiqued by two discriminators.</p>
+                        <p>An image discriminator D<sub>I</sub> operates on full image views from the real or rendered views, while a patch-consistency discriminator D<sub>P</sub> encourages consistency between views by operating on patches coming from a single real view or patches from different views of rendered images.</p>
+                    </div>
+                </div>
+            </div>
+            -->
+
+            <!-- Concurrent Work. -->
+            <br>
+            <div class="columns is-centered">
+                <div class="column is-full-width">
+                    <h2 class="title is-3">Related Links</h2>
+
+                    <div class="content has-text-justified">
+                        <p>
+                            For more work on similar tasks, please check out
+                        </p>
+                        <p>
+                            <a href="https://arxiv.org/abs/2002.10880">PolyGen: An Autoregressive Generative Model of 3D Meshes</a> generates meshes with two transformers, one for generating points, and another with faces with the help of pointer networks.
+                        </p>
+                        <p>
+                            <a href="https://bsp-net.github.io/">BSP-Net</a>, a network that generates compact meshes via binary space partitioning.
+                        </p>
+                        <p>
+                            <a href="https://arxiv.org/abs/1802.05384">AtlasNet: A Papier-Mâché Approach to Learning 3D Surface Generation</a> represents a 3D shape as a collection of parametric surface elements.
+                        </p>
+
+                        <p>
+                            <a href="https://meshdiffusion.github.io/">Mesh Diffusion</a> uses a 3D diffusion model to generate 3D meshes parametrized by deformable marching tetrahedra (DMTets).
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!--/ Concurrent Work. -->
+        </div>
+    </section>
+
+    <section class="section" id="BibTeX">
+        <div class="container is-max-desktop content">
+            <h2 class="title">BibTeX</h2>
+            <pre>
+                <code>
+
+                </code>
+            </pre>
+        </div>
+    </section>
+
+
+    <footer class="footer">
+        <div class="container">
+            <div class="content has-text-centered">
+                <a class="icon-link" href="static/MeshGPT.pdf">
+                    <i class="fas fa-file-pdf"></i>
+                </a>
+                <a class="icon-link" href="https://github.com/nihalsid" class="external-link">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+            <div class="columns is-centered">
+                <div class="column is-8">
+                    <div class="content">
+                        <p style="text-align:center">
+                            Source code mainly borrowed from <a href="https://keunhong.com/">Keunhong Park</a>'s <a
+                                href="https://nerfies.github.io/">Nerfies website</a>.
+                        </p>
+                        <p style="text-align:center">
+                            Please contact <a href="https://nihalsid.github.io/">Yawar Siddiqui</a> for feedback and questions.
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Import maps polyfill -->
+    <!-- Remove this when import maps will be widely supported -->
+    <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./js/three.module.js"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+
+    import { PLYLoader } from './js/PLYLoader.js';
+    import { OrbitControls } from './js/OrbitControls.js'
+    let div_to_scene = {
+        "mesh_chair_0": {
+            "geo": null,
+            "color": null,
+        },
+        "mesh_chair_1": {
+            "geo": null,
+            "color": null,
+        },
+        "mesh_chair_2": {
+            "geo": null,
+            "color": null,
+        },
+        "mesh_chair_3": {
+            "geo": null,
+            "color": null,
+        },
+        "mesh_car_0": {
+            "geo": null,
+            "color": null,
+        },
+        "mesh_car_1": {
+            "geo": null,
+            "color": null,
+        },
+        "mesh_car_2": {
+            "geo": null,
+            "color": null,
+        },
+        "mesh_car_3": {
+            "geo": null,
+            "color": null,
+        }
+    }
+    let div_to_render_scene = {
+        "mesh_style_0": {
+            "0": null,
+            "1": null,
+            "2": null,
+            "geo": null,
+        },
+        "mesh_style_1": {
+            "0": null,
+            "1": null,
+            "2": null,
+            "geo": null,
+        },
+        "mesh_style_2": {
+            "0": null,
+            "1": null,
+            "2": null,
+            "geo": null,
+        },
+        "mesh_style_3": {
+            "0": null,
+            "1": null,
+            "2": null,
+            "geo": null,
+        },
+    }
+    let mouse_button_down = false;
+    let list_of_orbit_controls = []
+    let style_camera = null;
+    let render_colors = true;
+    let style_id = "0"
+
+    function setup_camera(div_name){
+        let container = document.getElementById(div_name);
+        let width = container.parentElement.clientWidth;
+        let height = container.parentElement.clientHeight;
+        let camera = new THREE.PerspectiveCamera( 35, width / height, 0.1, 50 );
+
+        let camera_init_position = new THREE.Vector3( 2.25, 1.525, -3.75 );
+        camera_init_position = camera_init_position.multiplyScalar(0.55)
+        camera.position.set(camera_init_position.x, camera_init_position.y, camera_init_position.z);
+        return camera;
+    }
+
+    function setup_render_divs(div_name, mesh_path){
+        let camera = setup_camera(div_name)
+        let orbit_control = create_render_div(camera, div_name, mesh_path)
+        list_of_orbit_controls.push(orbit_control)
+    }
+
+    function create_render_div(camera, div_id, mesh_path) {
+        let container;
+        let renderer, controls;
+
+        init();
+        animate();
+
+        function init() {
+
+            container = document.getElementById(div_id);
+            let width = container.parentElement.clientWidth;
+            let height = container.parentElement.clientHeight;
+
+
+            div_to_scene[div_id]["color"] = new THREE.Scene();
+            div_to_scene[div_id]["geo"] = new THREE.Scene();
+            div_to_scene[div_id]["color"].background = new THREE.Color( 0xffffff );
+            div_to_scene[div_id]["geo"].background = new THREE.Color( 0xffffff );
+
+            // PLY file
+
+            const loader = new PLYLoader();
+            loader.load( mesh_path, function ( geometry ) {
+
+                geometry.computeVertexNormals();
+                let material_color = new THREE.MeshStandardMaterial( { color: 0xaaaaaa, flatShading: true, side: THREE.DoubleSide } )
+                let material_geo = new THREE.MeshStandardMaterial( { color: 0x444444, flatShading: true, side: THREE.DoubleSide } )
+
+                let wireframe = new THREE.WireframeGeometry( geometry );
+                let line = new THREE.LineSegments( wireframe );
+                line.material.color.setHex(0x000000);
+
+                const mesh_color = new THREE.Mesh( geometry, material_color );
+                const mesh_geo = new THREE.Mesh( geometry, material_geo );
+
+                div_to_scene[div_id]["color"].add( mesh_color );
+                div_to_scene[div_id]["color"].add(line);
+                div_to_scene[div_id]["geo"].add( mesh_geo );
+
+            }, (xhr) => {
+                console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+            }, (error) => {
+                console.log(error)
+            }
+            );
+
+            // lights
+
+            div_to_scene[div_id]["color"].add( new THREE.HemisphereLight( 0x333333, 0x222222 ) );
+            div_to_scene[div_id]["geo"].add( new THREE.HemisphereLight( 0x333333, 0x222222 ) );
+            addShadowedLight(div_to_scene[div_id]["color"], 1, 1, 1, 0xffffff, 1.35 / 2 );
+            addShadowedLight(div_to_scene[div_id]["color"],  0.5, 1, - 1, 0xffffff, 1 / 2 );
+            addShadowedLight(div_to_scene[div_id]["geo"], 1, 1, 1, 0xffffff, 1.35 );
+            addShadowedLight(div_to_scene[div_id]["geo"],  0.5, 1, - 1, 0xffffff, 1 );
+
+            // renderer
+
+            renderer = new THREE.WebGLRenderer( { antialias: true } );
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( width, height);
+            renderer.outputEncoding = THREE.sRGBEncoding;
+
+            renderer.shadowMap.enabled = true;
+
+            container.appendChild( renderer.domElement );
+
+            controls = new OrbitControls(camera, renderer.domElement)
+            controls.enableDamping = false
+
+            // resize
+
+            window.addEventListener( 'resize', onWindowResize );
+
+    }
+        function onWindowResize() {
+            let width = container.clientWidth;
+            let height = container.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize( width, height );
+        }
+        function animate() {
+            requestAnimationFrame( animate );
+            render();
+        }
+
+        function render() {
+            renderer.render( div_to_scene[div_id][render_colors ? "color" : "geo"], camera );
+            controls.update();
+        }
+
+        return controls;
+    }
+
+    function addShadowedLight(scene, x, y, z, color, intensity ) {
+
+        const directionalLight = new THREE.DirectionalLight( color, intensity );
+        directionalLight.position.set( x, y, z );
+        scene.add( directionalLight );
+
+        directionalLight.castShadow = true;
+
+        const d = 1;
+        directionalLight.shadow.camera.left = - d;
+        directionalLight.shadow.camera.right = d;
+        directionalLight.shadow.camera.top = d;
+        directionalLight.shadow.camera.bottom = - d;
+
+        directionalLight.shadow.camera.near = 1;
+        directionalLight.shadow.camera.far = 4;
+
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+
+        directionalLight.shadow.bias = - 0.001;
+
+    }
+
+    document.addEventListener('keydown', logKey);
+
+    function logKey(evt) {
+        if (evt.keyCode === 71 && !mouse_button_down) {
+            switch_geometry()
+        }
+        if (evt.keyCode === 82 && !mouse_button_down) {
+            list_of_orbit_controls.forEach(oc => {
+                console.log(oc.object.position)
+            })
+            reset_orbit_controls()
+        }
+    }
+
+    function switch_geometry() {
+        render_colors = !render_colors
+    }
+
+    function reset_orbit_controls() {
+        list_of_orbit_controls.forEach(oc => {
+            oc.reset()
+        })
+    }
+
+    function set_style_0(){
+        style_id = "0"
+    }
+
+    function set_style_1(){
+        style_id = "1"
+    }
+
+    function set_style_2(){
+        style_id = "2"
+    }
+
+    document.body.onmousedown = function(evt) {
+        if (evt.button === 0)
+            mouse_button_down = true
+    }
+    document.body.onmouseup = function(evt) {
+        if (evt.button === 0)
+            mouse_button_down = false
+    }
+
+    window.onload = function() {
+        let slider = document.getElementsByClassName("slider")[0]
+        slider.removeAttribute("tabIndex")
+        // slider.addEventListener("mouseout", reset_orbit_controls);
+        setup_render_divs("mesh_chair_0", './models/001328.ply')
+        setup_render_divs("mesh_chair_1", './models/002334.ply')
+        setup_render_divs("mesh_chair_2", './models/000739_.ply')
+        setup_render_divs("mesh_chair_3", './models/001490.ply')
+        setup_render_divs("mesh_car_0", './models/002853.ply')
+        setup_render_divs("mesh_car_1", './models/000845.ply')
+        setup_render_divs("mesh_car_2", './models/005548_.ply')
+        setup_render_divs("mesh_car_3", './models/000396_.ply')
+    };
+
+    </script>
+<!--    <script src="js/index.js"></script>-->
+
+</body>
+
+</html>
