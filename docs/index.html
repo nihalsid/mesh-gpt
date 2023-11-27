@@ -59,7 +59,7 @@
                 <div class="columns is-centered">
                     <div class="column has-text-centered">
                         <h1 class="title is-1 publication-title">MeshGPT: Generating Triangle Meshes with Decoder-Only Transformers</h1>
-                        <div class="is-size-5 publication-authors">
+                        <div class="is-size-4 publication-authors">
                             <span class="author-block">
                                 <a href="https://nihalsid.github.io/">Yawar Siddiqui</a><sup>1</sup>,</span>
                             <span class="author-block">
@@ -152,10 +152,10 @@
             <div class="hero-body" style="text-align: center">
                 <div class="columns">
                     <div class="column is-8" style="display: flex; justify-content: center; align-items: center; padding-top: 0; padding-bottom: 0">
-                        <img src="./static/teaser/web_teaser.jpg" style="max-height: 450px"/>
+                        <img src="./static/teaser/web_teaser.jpg" style="max-height: 350px"/>
                     </div>
-                    <div class="column is-4" style="height: 450px; padding: 0;">
-                        <div style="display: flex; height: 450px; justify-content: center;">
+                    <div class="column is-4" style="height: 350px; padding: 0;">
+                        <div style="display: flex; height: 350px; justify-content: center;">
                             <video poster="" autoplay="" muted="" loop="" style="pointer-events: none;">
                                 <source src="./static/teaser/web_teaser.mp4" type="video/mp4">
                             </video>
@@ -216,7 +216,7 @@
                         We introduce <span class="dnerf">MeshGPT</span>, a new approach for generating triangle meshes that reflects the compactness typical of artist-created meshes, in contrast to dense triangle meshes extracted by iso-surfacing methods from neural fields. Inspired by recent advances in powerful large language models, we adopt a sequence-based approach to autoregressively generate triangle meshes as sequences of triangles.
                         </p>
                         <p>
-                        We irst learn a vocabulary of latent quantized embeddings, using graph convolutions, which inform these embeddings of the local mesh geometry and topology. These embeddings are sequenced and decoded into triangles by a decoder, ensuring that they can effectively reconstruct the mesh. A transformer is then trained on this learned vocabulary to predict the index of the next embedding given previous embeddings. Once trained, our model can be autoregressively sampled to generate new triangle meshes, directly generating compact meshes with sharp edges, more closely imitating the efficient triangulation patterns of human-crafted meshes.
+                        We first learn a vocabulary of latent quantized embeddings, using graph convolutions, which inform these embeddings of the local mesh geometry and topology. These embeddings are sequenced and decoded into triangles by a decoder, ensuring that they can effectively reconstruct the mesh. A transformer is then trained on this learned vocabulary to predict the index of the next embedding given previous embeddings. Once trained, our model can be autoregressively sampled to generate new triangle meshes, directly generating compact meshes with sharp edges, more closely imitating the efficient triangulation patterns of human-crafted meshes.
                         </p>
                         <p>
                         <span class="dnerf">MeshGPT</span> demonstrates a notable improvement over state of the art mesh generation methods, with a 9% increase in shape coverage and a 30-point enhancement in FID scores across various categories.
